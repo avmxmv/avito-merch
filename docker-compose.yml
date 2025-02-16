@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: avito
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: avito_shop
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - avito-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U avito -d avito_shop"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: ../../avito-merch
+    ports:
+      - "8080:8080"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: avito
+      DB_PASSWORD: secret
+      DB_NAME: avito_shop
+      JWT_SECRET: supersecretkey
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - avito-net
+
+volumes:
+  postgres_data:
+
+networks:
+  avito-net:
