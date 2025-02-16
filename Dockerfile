@@ -9,7 +9,7 @@ WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 
-COPY ../../avito-merch .
+COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux go build -mod=mod -o avito-merch ./cmd/server
 
